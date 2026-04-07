@@ -8,9 +8,12 @@ export interface BookResult {
 }
 
 export async function searchBooks(query: string): Promise<BookResult[]> {
-  const url = `https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(query)}&maxResults=5&printType=books&langRestrict=en`;
-  const res = await fetch(url, { next: { revalidate: 0 } });
-  if (!res.ok) return [];
+  const url = `https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(query)}&maxResults=5&printType=books`;
+  const res = await fetch(url, { cache: "no-store" });
+  if (!res.ok) {
+    console.error("Google Books API error:", res.status, res.statusText);
+    return [];
+  }
 
   const data = await res.json();
   if (!data.items) return [];
